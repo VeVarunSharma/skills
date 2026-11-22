@@ -1,8 +1,8 @@
 {
-  "name": "varun-skills-marketplace",
-  "version": "0.1.0",
+  "name": "ve-skills-marketplace",
+  "version": "0.2.0",
   "private": true,
-  "description": "Maintenance checks for the varun Copilot plugin marketplace.",
+  "description": "Maintenance checks for the ve Copilot plugin marketplace.",
   "license": "MIT",
   "type": "module",
   "engines": {

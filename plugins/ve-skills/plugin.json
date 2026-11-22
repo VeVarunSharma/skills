@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "varun-skills",
-  "version": "0.1.0",
+  "name": "ve-skills",
+  "version": "0.2.0",
   "description": "Practical agent skills for architecting solutions, building grounded POCs, and telling the technical story.",
   "author": {
     "name": "VeVarunSharma",
