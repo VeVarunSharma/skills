@@ -1,0 +1,13 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "varun-skills",
+  "version": "0.1.0",
+  "description": "Practical agent skills for architecting solutions, building grounded POCs, and telling the technical story.",
+  "author": {
+    "name": "VeVarunSharma",
+    "url": "https://github.com/VeVarunSharma"
+  },
+  "homepage": "https://github.com/VeVarunSharma/skills",
+  "repository": "https://github.com/VeVarunSharma/skills",
+  "license": "MIT"
+}

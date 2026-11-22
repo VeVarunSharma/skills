@@ -1,0 +1,17 @@
+{
+  "name": "varun",
+  "owner": {
+    "name": "VeVarunSharma"
+  },
+  "metadata": {
+    "description": "Practical agent skills for architecting solutions, building grounded POCs, and telling the technical story."
+  },
+  "plugins": [
+    {
+      "name": "varun-skills",
+      "source": "./plugins/varun-skills",
+      "version": "0.1.0",
+      "description": "Practical agent skills for architecting solutions, building grounded POCs, and telling the technical story."
+    }
+  ]
+}
