@@ -6,10 +6,10 @@ import test from "node:test";
 import { validateRepository } from "./validate.mjs";
 
 function fixture(t) {
-  const root = mkdtempSync(join(tmpdir(), "varun-skills-test-"));
+  const root = mkdtempSync(join(tmpdir(), "ve-skills-test-"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const catalog = join(root, ".github", "plugin", "marketplace.json");
-  const pluginRoot = join(root, "plugins", "varun-skills");
+  const pluginRoot = join(root, "plugins", "ve-skills");
   const manifest = join(pluginRoot, "plugin.json");
   function write(file, value) {
     mkdirSync(dirname(file), { recursive: true });
@@ -23,7 +23,7 @@ function fixture(t) {
   function readmes(names = []) {
     const count = `**Implemented skills: ${names.length}.**`;
     write(join(pluginRoot, "README.md"), `# Test plugin\n\n${count}\n`);
-    const links = names.map((name) => `[${name}](plugins/varun-skills/skills/${name}/SKILL.md)`).join("\n");
+    const links = names.map((name) => `[${name}](plugins/ve-skills/skills/${name}/SKILL.md)`).join("\n");
     write(join(root, "README.md"), `# Test marketplace\n\n## Skill catalog\n\n${count}\n\n${links}\n\n## Roadmap\n\nPlanned, not implemented.\n`);
   }
   function addSkill(name = "summarize-notes", contents) {
@@ -33,14 +33,14 @@ function fixture(t) {
     return file;
   }
   write(catalog, {
-    name: "varun",
+    name: "ve",
     owner: { name: "VeVarunSharma" },
     metadata: { description: "Test skill pack." },
-    plugins: [{ name: "varun-skills", source: "./plugins/varun-skills", version: "0.1.0", description: "Test skill pack." }],
+    plugins: [{ name: "ve-skills", source: "./plugins/ve-skills", version: "0.1.0", description: "Test skill pack." }],
   });
   write(manifest, {
     $schema: "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-    name: "varun-skills",
+    name: "ve-skills",
     version: "0.1.0",
     description: "Test skill pack.",
     repository: "https://github.com/VeVarunSharma/skills",
@@ -62,6 +62,24 @@ test("an intentional zero-skill foundation is valid", (t) => {
   assert.deepEqual(validateRepository(f.root), { errors: [], pluginCount: 1, skillCount: 0 });
 });
 
+test("legacy marketplace and plugin identities are rejected", async (t) => {
+  await t.test("marketplace", (t) => {
+    const f = fixture(t);
+    f.editJson(f.catalog, (catalog) => { catalog.name = "varun"; });
+    assert.match(errors(f), /marketplace name must be ve/);
+  });
+  await t.test("plugin", (t) => {
+    const f = fixture(t);
+    f.editJson(f.catalog, (catalog) => {
+      catalog.plugins[0].name = "varun-skills";
+      catalog.plugins[0].source = "./plugins/varun-skills";
+    });
+    f.editJson(f.manifest, (manifest) => { manifest.name = "varun-skills"; });
+    renameSync(f.pluginRoot, join(f.root, "plugins", "varun-skills"));
+    assert.match(errors(f), /plugin entry name must be ve-skills/);
+  });
+});
+
 test("a real skill supports CRLF, folded descriptions, and string metadata", (t) => {
   const f = fixture(t);
   f.addSkill("summarize-notes", [
@@ -74,9 +92,9 @@ test("a real skill supports CRLF, folded descriptions, and string metadata", (t)
 
 test("malformed and duplicate-key JSON fail explicitly", async (t) => {
   for (const [label, contents] of [
-    ["syntax", '{"name": "varun",}'],
-    ["duplicate keys", '{"name":"varun","name":"replacement","plugins":[]}'],
-    ["escaped duplicate keys", '{"name":"varun","\\u006eame":"replacement"}'],
+    ["syntax", '{"name": "ve",}'],
+    ["duplicate keys", '{"name":"ve","name":"replacement","plugins":[]}'],
+    ["escaped duplicate keys", '{"name":"ve","\\u006eame":"replacement"}'],
   ]) {
     await t.test(label, (t) => {
       const f = fixture(t);
@@ -91,7 +109,7 @@ test("manifest schema, fields, types, and catalog versions are checked", async (
     ["unsupported schema", (m) => { m.$schema = "https://agent-plugins.org/schemas/9.0.0/plugin.schema.json"; }, /"\$schema" must be/],
     ["legacy component field", (m) => { m.skills = ["./skills"]; }, /unknown manifest field "skills"/],
     ["wrong description type", (m) => { m.description = []; }, /description must be a non-empty string/],
-    ["invalid name", (m) => { m.name = "Varun--Skills"; }, /name has invalid naming syntax/],
+    ["invalid name", (m) => { m.name = "Ve--Skills"; }, /name has invalid naming syntax/],
     ["version mismatch", (m) => { m.version = "0.2.0"; }, /version does not match/],
     ["invalid prerelease version", (m) => { m.version = "0.1.0-01"; }, /semantic version/],
     ["invalid author", (m) => { m.author = { url: 12 }; }, /author.url must be a non-empty string/],
@@ -107,11 +125,11 @@ test("manifest schema, fields, types, and catalog versions are checked", async (
 });
 
 test("a plugin source cannot escape or reinterpret the fixed local location", async (t) => {
-  for (const source of ["../outside", "/outside", "C:\\outside", "./plugins/../varun-skills", "https://example.com/plugin.git"]) {
+  for (const source of ["../outside", "/outside", "C:\\outside", "./plugins/../ve-skills", "https://example.com/plugin.git"]) {
     await t.test(source, (t) => {
       const f = fixture(t);
       f.editJson(f.catalog, (catalog) => { catalog.plugins[0].source = source; });
-      assert.match(errors(f), /source must equal \.\/plugins\/varun-skills/);
+      assert.match(errors(f), /source must equal \.\/plugins\/ve-skills/);
     });
   }
 });
@@ -186,7 +204,7 @@ test("skill counts and catalog links must reflect actual skill files", async (t)
   await t.test("nonexistent roadmap link", (t) => {
     const f = fixture(t);
     const readme = join(f.root, "README.md");
-    f.write(readme, `${readFileSync(readme, "utf8")}\n[Planned](plugins/varun-skills/skills/planned/SKILL.md)\n`);
+    f.write(readme, `${readFileSync(readme, "utf8")}\n[Planned](plugins/ve-skills/skills/planned/SKILL.md)\n`);
     assert.match(errors(f), /do not link an unimplemented skill/);
   });
 });

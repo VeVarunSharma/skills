@@ -248,7 +248,7 @@ export function validateRepository(directory) {
     }
     for (const match of markdown.matchAll(/\[[^\]\r\n]*\]\(([^)\s]+)\)/g)) {
       const link = match[1].replace(/^\.\//, "").split("#")[0];
-      if (link.startsWith("plugins/varun-skills/skills/") && !expected.has(link)) {
+      if (link.startsWith("plugins/ve-skills/skills/") && !expected.has(link)) {
         problem(file, `do not link an unimplemented skill, including in Roadmap: ${link}`);
       }
     }
@@ -262,7 +262,7 @@ export function validateRepository(directory) {
     const file = join(root, ...parts);
     if (lstatSync(file, { throwIfNoEntry: false })) problem(file, "competing marketplace catalog is not allowed");
   }
-  if (catalog.name !== "varun") problem(catalogFile, "marketplace name must be varun");
+  if (catalog.name !== "ve") problem(catalogFile, "marketplace name must be ve");
   author(catalog.owner, "owner", catalogFile, ["name", "email"]);
   if (catalog.owner?.name !== "VeVarunSharma") problem(catalogFile, "owner.name must be VeVarunSharma");
   if (fields(catalog.metadata, ["description", "version"], "metadata", catalogFile)) {
@@ -274,13 +274,13 @@ export function validateRepository(directory) {
     return result;
   }
   result.pluginCount = catalog.plugins.length;
-  if (catalog.plugins.length !== 1) problem(catalogFile, "this marketplace must contain exactly one varun-skills pack");
+  if (catalog.plugins.length !== 1) problem(catalogFile, "this marketplace must contain exactly one ve-skills pack");
   const license = readText(join(root, "LICENSE"));
   const names = new Set();
   for (const entry of catalog.plugins) {
     if (!fields(entry, ["name", "source", "version", "description"], "plugin entry", catalogFile)) continue;
     if (!name(entry.name, "plugin entry name", catalogFile)) continue;
-    if (entry.name !== "varun-skills") problem(catalogFile, "plugin entry name must be varun-skills");
+    if (entry.name !== "ve-skills") problem(catalogFile, "plugin entry name must be ve-skills");
     if (names.has(entry.name)) problem(catalogFile, `duplicate plugin entry: ${entry.name}`);
     names.add(entry.name);
     version(entry.version, "plugin entry version", catalogFile);
